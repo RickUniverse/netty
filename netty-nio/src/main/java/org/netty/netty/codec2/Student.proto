@@ -1,0 +1,33 @@
+// 编译指令 protoc.exe --java_out=. Student.proto
+syntax = "proto3";//版本
+option optimize_for = SPEED;//加快解析
+option java_package = "org.netty.netty.codec2";//生成包所在位置
+option java_outer_classname = "MyDataInfo";
+
+// proto使用message管理数据
+
+message MyMessage {
+  // 定义一个枚举类型
+  enum DataType { // 内部枚举类
+    StudentType = 0;// 在proto3 中要求，enum的编号从0开始
+    WorkerType = 1;
+  }
+
+  // 用data_type 来标志传的是哪一个枚举类型
+  DataType data_type = 1; // 第一个属性
+
+  // 表示每次枚举类型只能出现其中的一个，节省空间
+  oneof dataBody {
+    Student student = 2; // 第二个属性
+    Worker worker = 3; // 第三个属性
+  }
+}
+
+message Student {
+  int32 id = 1;
+  string name = 2;
+}
+message Worker {
+  int32 id = 1;
+  int32 age = 2;
+}

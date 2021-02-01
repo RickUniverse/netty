@@ -1,0 +1,11 @@
+// 编译指令 protoc.exe --java_out=. Student.proto
+// 包是：package org.netty.netty.codec;
+syntax = "proto3";//版本
+option java_outer_classname = "StudentPOJO"; // 生成的外部类名，同样也是内部类名
+// proto使用message管理数据
+message Student { // 会在StudentPOJO外部类生成一个内部类Student
+  // 它是真正发送的POJO对象
+  int32 id = 1;// Student中有一个属性是id 类型是int32（proto值）， 1，表示属性需要不是值
+  string name = 2;
+}
+
