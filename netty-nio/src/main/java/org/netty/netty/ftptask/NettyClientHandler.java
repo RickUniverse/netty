@@ -1,4 +1,4 @@
-package org.netty.netty.ftp;
+package org.netty.netty.ftptask;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

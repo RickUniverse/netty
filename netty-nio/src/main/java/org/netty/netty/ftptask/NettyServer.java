@@ -1,20 +1,27 @@
-package org.netty.netty.ftp;
+package org.netty.netty.ftptask;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 
 /**
  * @author lijichen
  * @date 2021/1/31 - 15:48
  */
 public class NettyServer {
+
+    /**
+     * 异步线程，这里会将整个handler加入到EventExecutorGroup， 线程中，不会加入到io线程中
+     */
+    static final EventExecutorGroup TASKGROUP = new DefaultEventExecutorGroup(2);
+
+
     public static void main(String[] args) throws InterruptedException {
+
         // 创建两个线程组boosGroup 和 workerGroup
         // boosGroup 只处理连接请求，业务处理交给workerGroup来做
         // 两个都是无限循环
@@ -34,7 +41,19 @@ public class NettyServer {
                         // 设置处理器
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new NettyServerHandler());
+
+                            ChannelPipeline pipeline = ch.pipeline();
+                            /**
+                             * pipeline.addLast(TASKGROUP,new NettyServerHandler());
+                             * 异步线程，这里会将整个handler加入到EventExecutorGroup， 线程中，不会加入到io线程中
+                             * 每个客户端所对应的handler就会依次循环加入到EventExecutorGroup中
+                             * 没有在NettyServerHandler 中使用灵活
+                             */
+//                            pipeline.addLast(TASKGROUP,new NettyServerHandler());
+
+                            pipeline.addLast(new NettyServerHandler());
+
+
                             // 可以使用一个集合管理SocketChannel 再推送消息时，
                             // 可将任务加入到各个channel对应的NioEventLoop的taskQueue获知scheduleTaskQueue
                             System.out.println("client的SocketChannel的哈希值:"+ch.hashCode());
